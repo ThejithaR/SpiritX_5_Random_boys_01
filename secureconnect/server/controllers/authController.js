@@ -201,12 +201,49 @@ export const sendResetOtp = async (req,res)=>{
 
 
 
+export const check_otp = async (req, res) => {
+    const { userID, otp } = req.body;
+    if (!userID || !otp) {
+        return res.json({ success: false, message: 'Missing Details' });
+    }
+    try {
+        const user = await userModel.findById(userID);
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
+
+        if (user.resetOtp === '' || user.resetOtp != otp) {
+            return res.json({ success: false, message: 'Invalid OTP!' });
+        }
+
+        if (user.resetOtpExpiresAt < Date.now()) {
+            return res.json({ success: false, message: 'OTP Expired!' });
+        }
+
+
+        
+        user.resetOtp = '';
+        user.resetOtpExpiredAt = 0;
+        
+        await user.save(); 
+
+
+        return res.json({ success: true, message: 'OTP confiremd .' });
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+
+
+
+
 // Reset user password
 export const resetPassword = async(req,res)=>{
-    const {email,otp,newPassword} = req.body;
+    const {email,newPassword} = req.body;
 
-    if(!email || !otp || !newPassword){
-        return res.json({success:false,message:'Email,OTP and new password are required'})
+    if(!email  || !newPassword){
+        return res.json({success:false,message:'Email and new password are required'})
     }
 
     try{
@@ -214,17 +251,11 @@ export const resetPassword = async(req,res)=>{
         if(!user){
             return res.json({success:false,message:"User not found!"})
         }
-        if(user.resetOtp === '' || user.resetOtp !== otp){
-            return res.json({success:false,message:"Invalid OTP!"})
-        }
-        if(user.resetOtpExpiredAt < Date.now() ){
-            return res.json({ success: false, message: 'OTP Expired!' });
-        }
+
 
         const encryptedPassword = await bcrypt.hash(newPassword,10);
         user.password = encryptedPassword;
-        user.resetOtp = '';
-        user.resetOtpExpiredAt = 0;
+
 
         await user.save();
 
