@@ -4,9 +4,9 @@ import userModel from '../models/userModel.js';
 import transporter from '../config/nodeMailer.js'
 
 export const register = async (req,res) =>{
-    const {name,email,password} = req.body;
-    
-    if(!name || !email || !password){
+    const {username,email,password} = req.body;
+
+    if(!username || !email || !password){
         return res.status(400).json({success:false,message:"All fields are required"});
         
     }

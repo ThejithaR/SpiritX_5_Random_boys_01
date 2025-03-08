@@ -7,9 +7,10 @@ import axios from 'axios'
 
 const Login = () => {
   const [state,setState] = useState('Sign Up')
-  const [name,setName] = useState('')
+  const [username,setUsername] = useState('')
   const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
+  const [confirmPassword , setConfirmPassword] = useState('')
   const navigate = useNavigate()
 
   const {backendUrl,setIsLoggedin,getUserData} = useContext(AppContext)
@@ -24,7 +25,7 @@ const Login = () => {
         
         if(state === "Sign Up"){
             const {data} = await axios.post(backendUrl + '/api/auth/register',{
-                name,
+                username,
                 email,
                 password
             })
@@ -59,17 +60,17 @@ const Login = () => {
 
 
   return (
-    <div className='flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-blue-200 to-purple-400'>
-        <img onClick={()=>navigate("/")} src={assets.logo} alt="" className='absolute left-5 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer'/>
+    <div className='flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600'>
+        <img onClick={()=>navigate("/")} src={assets.logo} alt="" className='absolute left-5 sm:left-20 top-5 w-60 sm:w-60 cursor-pointer'/>
         <div className='bg-slate-900 p-10 rounded-lg shadow-lg w-full sm:w-96 text-indigo-300 text-sm' >
-            <h2 className='text-3xl font-semibold text-white text-center mb-3' >{state === 'Sign Up'?'Create  acoount':'Login' }</h2>
-            <p className='text-center text-sm mb-6'>{state === 'Sign Up'?'Create Your acoount!':'Login to your acoount!' }</p>
+            <h2 className='text-3xl font-semibold text-white text-center mb-3' >{state === 'Sign Up'?'Create  account':'Login' }</h2>
+            <p className='text-center text-sm mb-6'>{state === 'Sign Up'?'Create Your account!':'Login to your account!' }</p>
         
             <form onSubmit={onSubmitHandler}>
                 {state === 'Sign Up' && (
                                 <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
                                     <img src={assets.person_icon} alt="" />
-                                    <input value={name} onChange={(e)=>setName(e.target.value)} className='bg-transparent outline-none' type="text" placeholder='Full Name'required />
+                                    <input value={username} onChange={(e)=>setUsername(e.target.value)} className='bg-transparent outline-none' type="text" placeholder='Enter User Name'required />
                                 </div>
                 )}
 
