@@ -8,20 +8,22 @@ export const register = async (req,res) =>{
 
     if(!username || !email || !password){
         return res.status(400).json({success:false,message:"All fields are required"});
+        
     }
 
     try{
+        
         const existingUser = await userModel.findOne({email})
         if(existingUser){
             return res.json({success:false,message:"User Already Exists!"})
         }
 
         const hashedPassword = await bcrypt.hash(password,10);
-        const user = new userModel({name,email,password:hashedPassword});
+        const user = new userModel({username,email,password:hashedPassword});
         await user.save();
-
+        
         const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'7d'})
-
+        
         res.cookie('token',token,{
             httpOnly:true,
             secure:process.env.NODE_ENV ==='production',
@@ -101,8 +103,9 @@ export const logout = async(req,res)=>{
 //send verification OTP to user email
 export const sendVerifyOtp = async(req,res)=>{
     try{
-        const {userID} = req.body;
-        const user = await userModel.findById(userID);
+        
+        const {userId} = req.body;
+        const user = await userModel.findById(userId);
         
         if(user.isAccountVerified){
             return res.json({success:false,message:"Account is already verified"})
@@ -131,12 +134,12 @@ export const sendVerifyOtp = async(req,res)=>{
 
 
 export const verifyEmail = async (req, res) => {
-    const { userID, otp } = req.body;
-    if (!userID || !otp) {
+    const { userId, otp } = req.body;
+    if (!userId || !otp) {
         return res.json({ success: false, message: 'Missing Details' });
     }
     try {
-        const user = await userModel.findById(userID);
+        const user = await userModel.findById(userId);
         if (!user) {
             return res.json({ success: false, message: "User not found" });
         }
@@ -151,7 +154,7 @@ export const verifyEmail = async (req, res) => {
 
 
         
-        user.isVerified = true;
+        user.isAccountVerified = true;
         user.verifyOtp = '';
         user.verifyOtpExpireAt = 0;
         
@@ -179,7 +182,7 @@ export const sendResetOtp = async (req,res)=>{
         }
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         user.resetOtp = otp;
-        user.resetOtpExpiredAt = Date.now() + 24*60*60*1000;
+        user.resetOtpExpiresAt = Date.now() + 24*60*60*1000;
 
         await user.save();
         
@@ -202,12 +205,13 @@ export const sendResetOtp = async (req,res)=>{
 
 
 export const check_otp = async (req, res) => {
-    const { userID, otp } = req.body;
-    if (!userID || !otp) {
+    const { email, otp } = req.body;
+    
+    if (!email || !otp) {
         return res.json({ success: false, message: 'Missing Details' });
     }
     try {
-        const user = await userModel.findById(userID);
+        const user = await userModel.findOne({email});
         if (!user) {
             return res.json({ success: false, message: "User not found" });
         }
@@ -223,7 +227,7 @@ export const check_otp = async (req, res) => {
 
         
         user.resetOtp = '';
-        user.resetOtpExpiredAt = 0;
+        user.resetOtpExpiresAt = 0;
         
         await user.save(); 
 
@@ -270,13 +274,13 @@ export const resetPassword = async(req,res)=>{
 
 export const isAuthenticated = async(req,res)=>{
     try{
-        const {userID} = req.body;
-        const user = await userModel.findById(userID);
+        const {userId} = req.body;
+        const user = await userModel.findById(userId);
         
         if(!user){
             return res.json({success:false,message:"User does not exists!"})
         }
-        if(user.isVerified){
+        if(user.isAccountVerified){
             return res.json({success:true})
         }else{
             return res.json({success:false})
