@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
-import { AppContent } from '../context/AppContext'
+import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 
@@ -12,7 +12,7 @@ const Login = () => {
   const [password,setPassword] = useState('')
   const navigate = useNavigate()
 
-  const {backendUrl,setIsLoggedin,getUserData} = useContext(AppContent)
+  const {backendUrl,setIsLoggedin,getUserData} = useContext(AppContext)
 
 
 
