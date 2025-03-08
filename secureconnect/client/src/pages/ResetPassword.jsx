@@ -60,7 +60,7 @@ const ResetPassword = () => {
     const otpArray = inputRefs.current.map((e) => e.value);
     setOtp(otpArray.join(""));
     try {
-      const { data } = await axios.post(backendUrl + "/api/auth/check-reset-otp", { otp })
+      const { data } = await axios.post(backendUrl + "/api/auth/check-reset-otp", { otp , email})
       data.success ? toast.success(data.message) : toast.error(data.message);
       data.success && setIsOtpSubmitted(true);
     } catch (error) { 

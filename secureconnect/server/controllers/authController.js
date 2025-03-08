@@ -19,7 +19,7 @@ export const register = async (req,res) =>{
         }
 
         const hashedPassword = await bcrypt.hash(password,10);
-        const user = new userModel({name,email,password:hashedPassword});
+        const user = new userModel({username,email,password:hashedPassword});
         await user.save();
         
         const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'7d'})
@@ -205,12 +205,12 @@ export const sendResetOtp = async (req,res)=>{
 
 
 export const check_otp = async (req, res) => {
-    const { userId, otp } = req.body;
-    if (!userId || !otp) {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
         return res.json({ success: false, message: 'Missing Details' });
     }
     try {
-        const user = await userModel.findById(userId);
+        const user = await userModel.findOne({email});
         if (!user) {
             return res.json({ success: false, message: "User not found" });
         }
