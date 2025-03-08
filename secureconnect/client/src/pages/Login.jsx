@@ -42,7 +42,9 @@ const Login = () => {
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
-    setPasswordStrength(validatePassword(newPassword));
+    if(state === 'Sign Up'){
+        setPasswordStrength(validatePassword(newPassword));
+    }
   };
 
   const getStrengthLabel = () => {
@@ -101,7 +103,7 @@ const Login = () => {
         } else {
           axios.defaults.withCredentials = true;
           const { data } = await axios.post(backendUrl + '/api/auth/login', {
-            email,
+            username,
             password,
           });
   
@@ -130,44 +132,58 @@ const Login = () => {
         
 
             <form onSubmit={onSubmitHandler}>
-                {state === 'Sign Up' && (
-                                <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
-                                    <img src={assets.person_icon} alt="" />
-                                    <input value={username} onChange={(e)=>setUsername(e.target.value)} className='bg-transparent outline-none' type="text" placeholder='Enter User Name'required />
-                                </div>
-                )}
-
                 <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
-                    <img src={assets.mail_icon} alt="" />
-                    <input value={email} onChange={(e)=>setEmail(e.target.value)} className='bg-transparent outline-none' type="email" placeholder='Email ID'required />
-                </div>
-                
-                
-                <div className='mb-4'>
-                    <div className='flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
-                        <img src={assets.lock_icon} alt='' />
-                        <input value={password} onChange={handlePasswordChange} className='bg-transparent outline-none' type='password' placeholder='Password' required />
-                    </div>
-                        <div className='mt-2 h-2 rounded-full w-full bg-gray-300'>
-                        <div className={`h-2 rounded-full ${getStrengthColor()}`} style={{ width: `${(passwordStrength / 5) * 100}%` }}></div>
-                    </div>
-                    <p className='text-xs mt-1 text-gray-400'>{getStrengthLabel()}</p>
+                    <img src={assets.person_icon} alt="" />
+                    <input value={username} onChange={(e)=>setUsername(e.target.value)} className='bg-transparent outline-none' type="text" placeholder='Enter User Name'required />
                 </div>
 
-                <div className={`mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C] ${confirmPassword && confirmPassword !== password ? 'border border-red-500' : ''}`}>
-                    <img src={assets.lock_icon} alt='' />
-                    <input
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`bg-transparent outline-none`}
-                        type='password'
-                        placeholder='Confirm password'
-                        required
-                    />
-                </div>
-                    {confirmPassword && confirmPassword !== password && <p className='text-xs text-red-500 text-left'>Passwords do not match</p>}
+                {state === 'Sign Up' && (
+                                
+                    <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
+                        <img src={assets.mail_icon} alt="" />
+                        <input value={email} onChange={(e)=>setEmail(e.target.value)} className='bg-transparent outline-none' type="email" placeholder='Email ID'required />
+                    </div>
+                )}
+                {state === 'Sign Up'? (
+                    <div>
+                        <div className='mb-4'>
+                            <div className='flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
+                                <img src={assets.lock_icon} alt='' />
+                                <input value={password} onChange={handlePasswordChange} className='bg-transparent outline-none' type='password' placeholder='Password' required />
+                            </div>
+                            <div className='mt-2 h-2 rounded-full w-full bg-gray-300'>
+                                <div className={`h-2 rounded-full ${getStrengthColor()}`} style={{ width: `${(passwordStrength / 5) * 100}%` }}></div>
+                            </div>
+                            <p className='text-xs mt-1 text-gray-400'>{getStrengthLabel()}</p>
+                        </div>
 
-                <br></br>
+                        <div className={`mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C] ${confirmPassword && confirmPassword !== password ? 'border border-red-500' : ''}`}>
+                            <img src={assets.lock_icon} alt='' />
+                            <input
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className={`bg-transparent outline-none`}
+                                type='password'
+                                placeholder='Confirm password'
+                                required
+                            />
+                        </div>
+                        {confirmPassword && confirmPassword !== password && <p className='text-xs text-red-500 text-left'>Passwords do not match</p>}
+                        <br></br>
+                    </div>
+                ):(
+                    <div>
+                        <div className='mb-4'>
+                            <div className='flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
+                                <img src={assets.lock_icon} alt='' />
+                                <input value={password} onChange={handlePasswordChange} className='bg-transparent outline-none' type='password' placeholder='Password' required />
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
+                    
+                
                 
                 <p onClick={()=>navigate("/reset-password")} className='mb-4 text-indigo-500 cursor-pointer'>Forgot password?</p>
                 

@@ -49,16 +49,16 @@ export const register = async (req,res) =>{
 }
 
 export const login =async (req,res) =>{
-    const {email,password} = req.body;
+    const {username,password} = req.body;
 
-    if(!email||!password){
-        return res.status(400).json({success:false,message:"Email and password are required"});
+    if(!username||!password){
+        return res.status(400).json({success:false,message:"Username and password are required"});
     }
     try{
-        const user = await userModel.findOne({email});
+        const user = await userModel.findOne({username});
         
         if(!user){
-            return res.json({success:false,message:'Invalid email'});
+            return res.json({success:false,message:'Invalid username'});
         }
         
         const isMatched = await bcrypt.compare(password,user.password)
@@ -77,7 +77,6 @@ export const login =async (req,res) =>{
         });
 
         return res.json({success:true})
-        
 
 
     }catch(error){
