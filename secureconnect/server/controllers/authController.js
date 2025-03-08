@@ -5,12 +5,14 @@ import transporter from '../config/nodeMailer.js'
 
 export const register = async (req,res) =>{
     const {name,email,password} = req.body;
-
+    
     if(!name || !email || !password){
         return res.status(400).json({success:false,message:"All fields are required"});
+        
     }
 
     try{
+        
         const existingUser = await userModel.findOne({email})
         if(existingUser){
             return res.json({success:false,message:"User Already Exists!"})
@@ -19,9 +21,9 @@ export const register = async (req,res) =>{
         const hashedPassword = await bcrypt.hash(password,10);
         const user = new userModel({name,email,password:hashedPassword});
         await user.save();
-
+        
         const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'7d'})
-
+        
         res.cookie('token',token,{
             httpOnly:true,
             secure:process.env.NODE_ENV ==='production',
@@ -101,8 +103,9 @@ export const logout = async(req,res)=>{
 //send verification OTP to user email
 export const sendVerifyOtp = async(req,res)=>{
     try{
-        const {userID} = req.body;
-        const user = await userModel.findById(userID);
+        
+        const {userId} = req.body;
+        const user = await userModel.findById(userId);
         
         if(user.isAccountVerified){
             return res.json({success:false,message:"Account is already verified"})
@@ -131,12 +134,12 @@ export const sendVerifyOtp = async(req,res)=>{
 
 
 export const verifyEmail = async (req, res) => {
-    const { userID, otp } = req.body;
-    if (!userID || !otp) {
+    const { userId, otp } = req.body;
+    if (!userId || !otp) {
         return res.json({ success: false, message: 'Missing Details' });
     }
     try {
-        const user = await userModel.findById(userID);
+        const user = await userModel.findById(userId);
         if (!user) {
             return res.json({ success: false, message: "User not found" });
         }
@@ -151,7 +154,7 @@ export const verifyEmail = async (req, res) => {
 
 
         
-        user.isVerified = true;
+        user.isAccountVerified = true;
         user.verifyOtp = '';
         user.verifyOtpExpireAt = 0;
         
@@ -202,12 +205,12 @@ export const sendResetOtp = async (req,res)=>{
 
 
 export const check_otp = async (req, res) => {
-    const { userID, otp } = req.body;
-    if (!userID || !otp) {
+    const { userId, otp } = req.body;
+    if (!userId || !otp) {
         return res.json({ success: false, message: 'Missing Details' });
     }
     try {
-        const user = await userModel.findById(userID);
+        const user = await userModel.findById(userId);
         if (!user) {
             return res.json({ success: false, message: "User not found" });
         }
@@ -270,13 +273,13 @@ export const resetPassword = async(req,res)=>{
 
 export const isAuthenticated = async(req,res)=>{
     try{
-        const {userID} = req.body;
-        const user = await userModel.findById(userID);
+        const {userId} = req.body;
+        const user = await userModel.findById(userId);
         
         if(!user){
             return res.json({success:false,message:"User does not exists!"})
         }
-        if(user.isVerified){
+        if(user.isAccountVerified){
             return res.json({success:true})
         }else{
             return res.json({success:false})

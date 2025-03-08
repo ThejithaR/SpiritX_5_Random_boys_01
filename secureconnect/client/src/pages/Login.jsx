@@ -36,6 +36,7 @@ const Login = () => {
                 toast.error(data.message)
             }
         }else{
+           
             const {data} = await axios.post(backendUrl + '/api/auth/login',{
                 email,
                 password
