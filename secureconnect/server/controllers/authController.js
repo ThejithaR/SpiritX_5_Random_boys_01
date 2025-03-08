@@ -182,7 +182,7 @@ export const sendResetOtp = async (req,res)=>{
         }
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         user.resetOtp = otp;
-        user.resetOtpExpiredAt = Date.now() + 24*60*60*1000;
+        user.resetOtpExpiresAt = Date.now() + 24*60*60*1000;
 
         await user.save();
         
@@ -206,6 +206,7 @@ export const sendResetOtp = async (req,res)=>{
 
 export const check_otp = async (req, res) => {
     const { email, otp } = req.body;
+    
     if (!email || !otp) {
         return res.json({ success: false, message: 'Missing Details' });
     }
@@ -226,7 +227,7 @@ export const check_otp = async (req, res) => {
 
         
         user.resetOtp = '';
-        user.resetOtpExpiredAt = 0;
+        user.resetOtpExpiresAt = 0;
         
         await user.save(); 
 
